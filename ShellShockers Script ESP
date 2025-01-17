@@ -13,7 +13,6 @@
 
     console.log("[ESP Script] Waiting for game...");
 
-    // Ждем полной загрузки игры
     const waitForGameInterval = setInterval(() => {
         if (window.game) {
             clearInterval(waitForGameInterval);
@@ -23,15 +22,14 @@
     }, 1000);
 
     function enableESP() {
-        const canvas = document.querySelector('canvas'); // Находим канвас игры
-        const ctx = canvas.getContext('2d'); // Получаем 2D-контекст
-
-        // Подменяем рендер-цикл
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext('2d');
         const originalRender = window.requestAnimationFrame;
+
         window.requestAnimationFrame = function (callback) {
             return originalRender.call(this, function () {
                 try {
-                    renderESP(ctx); // Вызываем отрисовку ESP
+                    renderESP(ctx);
                 } catch (e) {
                     console.error("[ESP Script] Error in ESP rendering:", e);
                 }
@@ -41,13 +39,13 @@
     }
 
     function renderESP(ctx) {
-        const players = window.game.players; // Получаем список игроков
+        const players = window.game.players;
 
         if (!players || players.length === 0) return;
 
         players.forEach(player => {
             if (player !== window.game.myPlayer && player.team !== window.game.myPlayer.team) {
-                drawESPBox(ctx, player); // Рисуем рамку только для врагов
+                drawESPBox(ctx, player);
             }
         });
     }
@@ -56,18 +54,15 @@
         const canvas = document.querySelector('canvas');
         const { width, height } = canvas;
 
-        // Конвертируем мировые координаты в экранные
         const screenPos = worldToScreen(player.x, player.y, player.z, width, height);
         if (!screenPos) return;
 
-        // Параметры рамки
         const boxWidth = 50;
         const boxHeight = 100;
 
-        ctx.strokeStyle = "red"; // Красный цвет для рамки
+        ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
 
-        // Рисуем рамку
         ctx.beginPath();
         ctx.rect(screenPos.x - boxWidth / 2, screenPos.y - boxHeight / 2, boxWidth, boxHeight);
         ctx.stroke();
@@ -75,14 +70,12 @@
     }
 
     function worldToScreen(x, y, z, canvasWidth, canvasHeight) {
-        // Пример преобразования координат (упрощённый)
         const screenX = (x / z) * canvasWidth + canvasWidth / 2;
         const screenY = (y / z) * canvasHeight + canvasHeight / 2;
 
         if (screenX < 0 || screenX > canvasWidth || screenY < 0 || screenY > canvasHeight) {
-            return null; // Если игрок вне видимой зоны экрана
+            return null; 
         }
-
         return { x: screenX, y: screenY };
     }
 })();
